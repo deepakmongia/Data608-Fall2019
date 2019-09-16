@@ -75,6 +75,17 @@ Lets dig in on the state with the 3rd most companies in the data set. Imagine yo
 ```{r}
 
 # Answer Question 2 here
+## Finding the state with the 3rd largest number of companies
+third_most_companies_state <- toString(as.data.frame(list(sort(table(inc$State), decreasing = TRUE)))[3,1])
+
+ny_df <- inc[inc$State == third_most_companies_state,]
+
+ggplot(ny_df, aes(x=factor(Industry), y=Employees)) +
+  geom_boxplot() +
+  coord_flip() +
+  xlab("Industry") +
+  ylab("Employees counts") +
+  ggtitle("NY - industry wise counts")
 
 ```
 
