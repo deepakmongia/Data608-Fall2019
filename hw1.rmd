@@ -76,16 +76,47 @@ Lets dig in on the state with the 3rd most companies in the data set. Imagine yo
 
 # Answer Question 2 here
 ## Finding the state with the 3rd largest number of companies
-third_most_companies_state <- toString(as.data.frame(list(sort(table(inc$State), decreasing = TRUE)))[3,1])
+inc_complete = inc[complete.cases(inc), ]
 
-ny_df <- inc[inc$State == third_most_companies_state,]
+third_most_companies_state <- toString(as.data.frame(list(sort(table(inc_complete$State), decreasing = TRUE)))[3,1])
+
+ny_df <- inc_complete[inc_complete$State == third_most_companies_state,]
 
 ggplot(ny_df, aes(x=factor(Industry), y=Employees)) +
   geom_boxplot() +
-  coord_flip() +
   xlab("Industry") +
   ylab("Employees counts") +
-  ggtitle("NY - industry wise counts")
+  ggtitle("NY - industry wise counts") +
+  stat_summary(fun.y=mean, colour="darkred", geom="point", 
+               shape=18, size=3) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+
+### Removing the outliers
+max_value <- vector()
+
+for (i in levels(ny_df$Industry))
+  {
+  upper.limit <- quantile(ny_df[ny_df$Industry == i, ]$Employees)[4] +
+    1.5*IQR(ny_df[ny_df$Industry == i, ]$Employees)
+    
+    max_value <- c(max_value, upper.limit)
+    
+  }
+
+#Now we have the max value for each category for the data notn outlier. We will use the minimum value as 0
+## Plotting without the outliers
+
+ggplot(ny_df, aes(x=factor(Industry), y=Employees)) +
+  geom_boxplot(outlier.colour = NA) +
+  xlab("Industry") +
+  ylab("Employees counts") +
+  ggtitle("NY - industry wise counts") +
+  stat_summary(fun.y=mean, colour="darkred", geom="point", 
+               shape=18, size=3) +
+  coord_cartesian(ylim = c(0, max(max_value))) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
 
 ```
 
@@ -96,6 +127,15 @@ Now imagine you work for an investor and want to see which industries generate t
 ```{r}
 
 # Answer Question 3 here
+inc_revenue_per_employee_df <- group_by(inc_complete, Industry) %>% summarise(Revenue_per_employee = sum(Revenue) / sum(Employees))
+
+ggplot(inc_revenue_per_employee_df, aes(x=reorder(Industry, Revenue_per_employee), y=Revenue_per_employee)) + 
+  geom_bar(stat = 'Identity') +
+  coord_flip() +
+  xlab("Industry") +
+  ylab("Revenue per employee (in dollars)") +
+  ggtitle("Revenue per employee - industry wise") +
+  scale_y_continuous(labels = scales::comma)
 
 ```
 
