@@ -15,6 +15,7 @@ import os
 import plotly.express as px
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
+import seaborn as sns
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -74,6 +75,10 @@ app.layout = html.Div([
                 ]),
         html.Div([
                 dcc.Graph(id='health_proportion_graph')
+                ]),
+    
+        html.Div([
+                dcc.Graph(id='correlation_graph')
                 ])
     
     #html.Div(id='output-container')
@@ -81,7 +86,8 @@ app.layout = html.Div([
 
 
 @app.callback(
-    dash.dependencies.Output('health_proportion_graph', 'figure'),
+    [dash.dependencies.Output('health_proportion_graph', 'figure'),
+     dash.dependencies.Output('correlation_graph', 'figure')]
     [dash.dependencies.Input('my-dropdown1', 'value'),
      dash.dependencies.Input('my-dropdown2', 'value')])
 def update_graph(spc_common_input, borough_input):
@@ -108,14 +114,20 @@ def update_graph(spc_common_input, borough_input):
     
     health_df = pd.DataFrame({'Health_value': s.index, 'Count': s.values})
     
+    a = pd.crosstab(all_trees_df['steward'], all_trees_df['health'], margins=True)
+    
+    b = a[:-1]
     
     #return { all_trees_df.shape }
     #return 'Shape of the array for the selected values: %s ' % (str(all_trees_df.shape))
     #return 'You have selected spc_common "%s" and borough "%s"' % (spc_common_input, borough_input)
     
     return {
-            'data': [
+            'data1': [
                         go.Pie(labels=health_df['Health_value'], values=health_df['Count'])
+                    ],
+            'data2': [
+                        sns.heatmap(b)
                     ]
             }
 
