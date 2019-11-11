@@ -1,0 +1,89 @@
+<html>
+
+<head><title>Module 5 - Question 1</title></head>
+
+<body>
+
+<h1>Module 5 - Question 1</h1>
+<h2>There are 2 functionalities on this web page 
+    1. Reverse a word
+    2. Input a number, and it prints first 20 multiples of the number
+</h2>
+
+<script type="text/javascript">
+
+document.write('<br><p>Enter a word, and we will write the reverse of the word for you !')
+
+// Basic functions
+
+function reverse(){
+    var t = document.getElementById("target1");
+    var input_word = document.getElementById('word').value;
+    var length_word = input_word.length;
+    var reverse_word = '';
+    var j;
+    for (j=length_word - 1; j >= 0; j--)
+    {
+        reverse_word += input_word[j];
+    }
+
+    t.innerHTML = reverse_word
+}
+
+function multiples(){
+    var t = document.getElementById("target2");
+    input_number = document.getElementById('input_number').value;
+    var myArray = new Array();
+        for (var i=0; i<20; i++){
+            myArray[i] = input_number * (i+1)
+        }                             
+    
+    var myTable= "<table><tr><td style='width: 20px; text-align: right; </td></tr>";
+
+    for (var i=0; i<20; i++) {
+        myTable+="<tr><td style='width: 20px; text-align: right;'>" + myArray[i] + "</td>";
+        i++;
+        myTable+="<td style='width: 20px; text-align: right;'>" + myArray[i] + "</td>";
+        i++;
+        myTable+="<td style='width: 20px; text-align: right;'>" + myArray[i] + "</td>";
+        i++;
+        myTable+="<td style='width: 20px; text-align: right;'>" + myArray[i] + "</td></tr>";                
+    }  
+    myTable+="</table>";
+
+    t.innerHTML = myTable
+
+}
+
+</script>
+
+<p>
+<form>
+    <input id="word" type="text" >
+    <input type="button" value="reverse" onClick="reverse();">
+</form>
+</p>
+
+<div id="target1"></div>
+
+<script type="text/javascript">
+
+    document.write('<br><p>Enter a number and we will print first 20 multiples of the number below')
+
+</script>
+
+<p>
+    <form>
+        <input id="input_number" type="number" >
+        <input type="button" value="multiples" onClick="multiples();">
+    </form>
+</p>
+        
+<div id="target2"></div>
+
+<script type="text/javascript" src="other_script.js"></script>
+
+<script type="text/javascript"> document.write(myScript());</script>
+
+</body>
+</html>
