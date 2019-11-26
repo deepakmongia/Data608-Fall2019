@@ -1,0 +1,76 @@
+---
+title: "Assignment - 6"
+author: "Deepak Mongia"
+date: "11/25/2019"
+output: html_document
+---
+
+## Assignment - 6
+
+### This is an assignment which has been built to help with the final project for Data 608 - Knowledge and Visual Analytics
+
+The final project deals with the open Chicago data at the location given below - related to traffic crashes in city of Chicago. https://data.cityofchicago.org/Transportation/Traffic-Crashes-Crashes/85ca-t3if
+The data contains the crashes details including important parameters like crash date, posted speed limit, weather condition, # of lanes, traffic way type.
+
+As a part of this visualization project, we will be building a user friendly visualization in R Shiny using Plotly - to show how the crashes frequency and seriousness is impacted based on important parameters like the month of the year, posted speed limit, # of lanes, etc.
+
+Below I have prepared some visualizations using plotly which I am utilizing in generating a Shiny app for the final users to help look for multiple options to explore how the Chicago accidents have happened under varu=ious categries.
+
+1. Loading the required packages.
+```{r}
+library(RSocrata)
+library(dplyr)
+library(plyr)
+library(plotly)
+library(kableExtra)
+```
+
+
+2. Loading the data into R
+```{r cachedChunk, cache=TRUE}
+chicago_accidents <- read.socrata("https://data.cityofchicago.org/resource/85ca-t3if.json")
+```
+
+3. Displaying the dimensions
+```{r}
+print(dim(chicago_accidents))
+
+colnames(chicago_accidents)
+
+chicago_accidents %>% head(5) %>% kable() %>% kable_styling()
+```
+
+4. Plotting a few graphs - these graphs are based on a particular value of a few variables. As we move into the final project though Shiny, these variables will be handled by the user using a drop down.
+But for now, the variables are hard coded for the few visualizations we are displaying below:
+
+Plotting total crashes - month wise:
+```{r}
+chicago_accidents$crash_month_year <- substr(chicago_accidents$crash_date, 1,7)
+
+plyr::count(chicago_accidents, "crash_month_year") %>% 
+  subset(crash_month_year > '2015-09') %>% 
+  plot_ly(x = ~crash_month_year, y = ~freq, mode = 'lines', type = 'scatter')
+```
+
+Plotting non-fatal crashes distribution based on road condition for one of the 12 months - from overall reading.
+```{r}
+
+# Displaying the distribution of the crashes based on the road conditions for the month of January.
+
+chicago_accidents %>% subset(injuries_fatal = 0) %>%
+  subset(crash_month == 1) %>%
+  plyr::count("roadway_surface_cond") %>%
+  plot_ly(x = ~roadway_surface_cond, y = ~freq, type = 'bar') %>%
+  layout(yaxis = list(title = 'value'), barmode = 'stack')
+```
+
+On similar lines, fatal crashes distribution --> injuries_fatal > 0:
+```{r}
+chicago_accidents %>% subset(injuries_fatal > 0) %>%
+  subset(crash_month == 1) %>%
+  plyr::count("roadway_surface_cond") %>%
+  plot_ly(x = ~roadway_surface_cond, y = ~freq, type = 'bar') %>%
+  layout(yaxis = list(title = 'value'), barmode = 'stack')
+```
+
+We will use the above graphs to present plots based on what the user choses - fatal or no-fatal crashes, and then the month of the year the user wants to analyze.
